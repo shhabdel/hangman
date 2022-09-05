@@ -1,0 +1,71 @@
+from curses.ascii import isalpha
+import random
+from re import A
+from turtle import Shape
+
+words_source = open('dict.txt', 'r')
+words = words_source.read().split('\n')
+bodies = [[], ["O"], [" O", " |"], [" O", "\\|"], [" O", "\\|/"], [" O", "\\|/", "/"], [" O", "\\|/", "/ \\"]]
+
+keep_playing = True
+
+while(keep_playing):
+    word = random.choice(words)
+    to_guess = [False] * len(word)
+    guessed = []
+
+    print("Welcome to hangman")
+    print(len(word)*'_ ')
+
+    guess = input("\nPlease enter your first guess\n").lower()
+    current_body = 0
+
+    while(True):
+        if len(guess) != 1:
+            guess = input("Please enter one letter only followed by enter.\n")
+            continue
+        if not isalpha(guess):
+            guess = input("You've entered \"" + guess + "\". Please enter a letter.\n")
+            continue 
+
+        if guess in guessed: 
+            guess = input("\nYou've already guessed \"" + guess + "\". Please try again.\n").lower()
+            continue    
+        if guess in word: 
+            print("\nNice! That is correct!")
+            indices = [i for i, x in enumerate(word) if x == guess]
+            for i in indices: to_guess[i] = True
+        else:
+            print("\nOops, that's incorrect :(")
+            current_body += 1
+
+
+        guessed.append(guess)
+
+        for i in range(len(word)):
+            if to_guess[i]:
+                print(word[i], end='')
+            else:
+                print('_ ', end='')
+    
+        if (current_body > 0): 
+            print("\n\nBoard:")
+            for i in bodies[current_body]: print(i)
+
+        if (all(to_guess)):
+            print("\nCongratulations! You've beat the game by guessing the word \"" + word + "\" correctly!")
+            break
+
+        if (current_body == 6): 
+            print("The word was \"" + word + "\".")
+            break
+            
+        
+        guess = input("\nPlease enter your next guess\n").lower()
+   
+    play_again = input("Would you like to play again? [y/n]").lower()
+    while(play_again != "y" and play_again != "n"):
+        play_again = input("Would you like to play again? [y/n]").lower()
+    keep_playing = True if play_again == "y" else False 
+    
+print("Thanks for playing! Come back soon :)")
